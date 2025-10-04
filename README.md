@@ -4,7 +4,7 @@ High-precision airport and runway data for precision approach applications, crow
 
 ## Why This Repository?
 
-Traditional airport databases (like OurAirports) provide location data with ~1-10 meter precision, which is insufficient for precision approach guidance. This repository contains community-contributed airport surveys with centimeter-level accuracy from RTK/PPP GPS receivers.
+Testing a "Pretty Precise Approach" app for DIY decimiter class GPS approach/landing guidance and that will only work if there is precise survey data for the airstrip.
 
 ## Data Quality
 
@@ -110,19 +110,10 @@ Each airport is stored as a JSON file with the following structure:
 
 We welcome high-precision airport surveys! See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
 
-### Quick Start
-
-1. Survey a runway using the PPA app with RTK/PPP GPS
-2. Export the survey data (JSON format)
-3. Fork this repository
-4. Add your airport file to the appropriate country folder
-5. Submit a pull request
-
 ### Quality Standards
 
-- GPS accuracy must be <2 meters (preferably <0.5m)
+- GPS accuracy must be <30 cm or better
 - All 4 runway corners must be surveyed
-- Survey date must be within last 5 years
 - Coordinates must have 8 decimal places precision
 
 ## Data License
