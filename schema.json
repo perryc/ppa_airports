@@ -1,0 +1,235 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "PPA Airport Data Schema",
+  "description": "High-precision airport and runway survey data for precision approach applications",
+  "type": "object",
+  "required": ["icao", "name", "location", "runways", "metadata"],
+  "properties": {
+    "icao": {
+      "type": "string",
+      "description": "Airport identifier: ICAO code (CDS2, CYQV), FAA LID (3W5), or coordinate-based for private strips (CA_52N106W, US_45.2N093.1W)",
+      "pattern": "^([A-Z0-9]{3,4}|[A-Z]{2}_[0-9]{1,2}(\.[0-9]+)?[NS][0-9]{1,3}(\.[0-9]+)?[EW])$",
+      "examples": ["CDS2", "CYQV", "KORD", "3W5", "CA_52N106W", "US_45.2N093.1W"]
+    },
+    "name": {
+      "type": "string",
+      "description": "Airport name (official name or property name for private strips)",
+      "minLength": 1,
+      "examples": ["Disley Airport", "Regina International Airport", "Casson Farm", "Bob's Strip"]
+    },
+    "type": {
+      "type": "string",
+      "description": "Airport type",
+      "enum": ["public", "private", "military", "heliport"],
+      "examples": ["public", "private"]
+    },
+    "location": {
+      "type": "object",
+      "description": "Airport reference point (typically center or main runway threshold)",
+      "required": ["latitude", "longitude", "elevation_ft"],
+      "properties": {
+        "latitude": {
+          "type": "number",
+          "description": "Latitude in decimal degrees (8 decimal places for ~1mm precision)",
+          "minimum": -90,
+          "maximum": 90
+        },
+        "longitude": {
+          "type": "number",
+          "description": "Longitude in decimal degrees (8 decimal places for ~1mm precision)",
+          "minimum": -180,
+          "maximum": 180
+        },
+        "elevation_ft": {
+          "type": "number",
+          "description": "Elevation in feet MSL (1 decimal place)",
+          "minimum": -1000,
+          "maximum": 30000
+        }
+      }
+    },
+    "runways": {
+      "type": "array",
+      "description": "Array of runway data",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": [
+          "designator",
+          "surveyed",
+          "length_ft",
+          "width_ft",
+          "threshold_17",
+          "threshold_35"
+        ],
+        "properties": {
+          "designator": {
+            "type": "string",
+            "description": "Runway designator (e.g., '17/35', '09/27')",
+            "pattern": "^[0-3][0-9][LCR]?/[0-3][0-9][LCR]?$",
+            "examples": ["17/35", "09L/27R", "18/36"]
+          },
+          "surveyed": {
+            "type": "boolean",
+            "description": "Whether this runway has been surveyed with high-precision GPS"
+          },
+          "survey_date": {
+            "type": "string",
+            "format": "date",
+            "description": "Date of survey (ISO 8601 format: YYYY-MM-DD)",
+            "examples": ["2025-10-03"]
+          },
+          "survey_accuracy_m": {
+            "type": "number",
+            "description": "GPS accuracy during survey in meters",
+            "minimum": 0,
+            "maximum": 10,
+            "examples": [0.02, 0.15, 1.5]
+          },
+          "survey_method": {
+            "type": "string",
+            "description": "Method used for survey",
+            "enum": ["RTK_GPS", "PPP_GPS", "PPP_HAS", "DGPS", "STANDARD_GPS"],
+            "examples": ["RTK_GPS", "PPP_HAS"]
+          },
+          "surveyor": {
+            "type": "string",
+            "description": "GitHub username of surveyor",
+            "examples": ["perryc"]
+          },
+          "length_ft": {
+            "type": "number",
+            "description": "Runway length in feet (calculated from survey)",
+            "minimum": 100,
+            "maximum": 20000
+          },
+          "width_ft": {
+            "type": "number",
+            "description": "Runway width in feet (calculated from survey)",
+            "minimum": 10,
+            "maximum": 500
+          },
+          "surface": {
+            "type": "string",
+            "description": "Runway surface type",
+            "enum": ["asphalt", "concrete", "grass", "gravel", "dirt", "water", "snow", "ice", "unknown"],
+            "examples": ["grass", "asphalt"]
+          },
+          "threshold_17": {
+            "$ref": "#/definitions/threshold_point"
+          },
+          "threshold_35": {
+            "$ref": "#/definitions/threshold_point"
+          },
+          "touchdown_17": {
+            "$ref": "#/definitions/coordinate_point"
+          },
+          "touchdown_35": {
+            "$ref": "#/definitions/coordinate_point"
+          },
+          "corners": {
+            "type": "array",
+            "description": "4-corner survey points (clockwise)",
+            "minItems": 4,
+            "maxItems": 4,
+            "items": {
+              "type": "object",
+              "required": ["id", "latitude", "longitude", "elevation_ft"],
+              "properties": {
+                "id": {
+                  "type": "string",
+                  "enum": ["corner_1", "corner_2", "corner_3", "corner_4"]
+                },
+                "latitude": {"type": "number", "minimum": -90, "maximum": 90},
+                "longitude": {"type": "number", "minimum": -180, "maximum": 180},
+                "elevation_ft": {"type": "number"}
+              }
+            }
+          }
+        }
+      }
+    },
+    "metadata": {
+      "type": "object",
+      "description": "Metadata about this airport record",
+      "required": ["last_updated", "contributors", "data_source"],
+      "properties": {
+        "last_updated": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Last update timestamp (ISO 8601)",
+          "examples": ["2025-10-03T12:00:00Z"]
+        },
+        "contributors": {
+          "type": "array",
+          "description": "GitHub usernames of contributors",
+          "items": {"type": "string"},
+          "minItems": 1
+        },
+        "data_source": {
+          "type": "string",
+          "description": "Source of the data",
+          "enum": ["ppa_mobile_survey", "manual_entry", "other"],
+          "examples": ["ppa_mobile_survey"]
+        },
+        "notes": {
+          "type": "string",
+          "description": "Additional notes about this airport or survey"
+        }
+      }
+    }
+  },
+  "definitions": {
+    "coordinate_point": {
+      "type": "object",
+      "description": "A geographic coordinate point",
+      "required": ["latitude", "longitude", "elevation_ft"],
+      "properties": {
+        "latitude": {
+          "type": "number",
+          "minimum": -90,
+          "maximum": 90
+        },
+        "longitude": {
+          "type": "number",
+          "minimum": -180,
+          "maximum": 180
+        },
+        "elevation_ft": {
+          "type": "number"
+        }
+      }
+    },
+    "threshold_point": {
+      "type": "object",
+      "description": "Runway threshold with heading information",
+      "allOf": [
+        {"$ref": "#/definitions/coordinate_point"},
+        {
+          "type": "object",
+          "required": ["heading_mag", "heading_true", "magnetic_variation"],
+          "properties": {
+            "heading_mag": {
+              "type": "number",
+              "description": "Magnetic heading in degrees",
+              "minimum": 0,
+              "maximum": 360
+            },
+            "heading_true": {
+              "type": "number",
+              "description": "True heading in degrees",
+              "minimum": 0,
+              "maximum": 360
+            },
+            "magnetic_variation": {
+              "type": "number",
+              "description": "Magnetic variation in degrees (positive = East)",
+              "minimum": -180,
+              "maximum": 180
+            }
+          }
+        }
+      ]
+    }
+  }
+}
