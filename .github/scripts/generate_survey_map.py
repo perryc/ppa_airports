@@ -33,7 +33,7 @@ def parse_survey_data(file_path: Path) -> Optional[Dict[str, Any]]:
         # Extract runway survey data (adapt to your JSON structure)
         survey_info = {
             'file': str(file_path),
-            'airport_icao': data.get('icao', data.get('airport_icao', 'UNKNOWN')),
+            'airport_icao': data.get('icao_code', data.get('icao', data.get('airport_icao', 'UNKNOWN'))),
             'airport_name': data.get('name', data.get('airport_name', '')),
             'runways': []
         }
@@ -42,26 +42,32 @@ def parse_survey_data(file_path: Path) -> Optional[Dict[str, Any]]:
         runways = data.get('runways', [data]) if 'runways' in data else [data]
 
         for runway in runways:
+            # Handle both flat and nested structure
+            thr1 = runway.get('threshold1', {})
+            thr2 = runway.get('threshold2', {})
+            td1 = runway.get('touchdown1', {})
+            td2 = runway.get('touchdown2', {})
+
             runway_info = {
-                'designator': runway.get('runwayNumber', runway.get('designator', 'N/A')),
-                'heading': runway.get('trueHeading', runway.get('heading', 0)),
-                'length': runway.get('length', 0),
-                'width': runway.get('width', 0),
+                'designator': runway.get('designation', runway.get('runwayNumber', runway.get('designator', 'N/A'))),
+                'heading': runway.get('magnetic_heading', runway.get('trueHeading', runway.get('heading', 0))),
+                'length': runway.get('length_ft', runway.get('length', 0)),
+                'width': runway.get('width_ft', runway.get('width', 0)),
                 'threshold1': {
-                    'lat': runway.get('threshold1Latitude', 0),
-                    'lon': runway.get('threshold1Longitude', 0),
+                    'lat': thr1.get('latitude', runway.get('threshold1Latitude', 0)),
+                    'lon': thr1.get('longitude', runway.get('threshold1Longitude', 0)),
                 },
                 'threshold2': {
-                    'lat': runway.get('threshold2Latitude', 0),
-                    'lon': runway.get('threshold2Longitude', 0),
+                    'lat': thr2.get('latitude', runway.get('threshold2Latitude', 0)),
+                    'lon': thr2.get('longitude', runway.get('threshold2Longitude', 0)),
                 },
                 'touchdown1': {
-                    'lat': runway.get('touchdown1Latitude', 0),
-                    'lon': runway.get('touchdown1Longitude', 0),
+                    'lat': td1.get('latitude', runway.get('touchdown1Latitude', 0)),
+                    'lon': td1.get('longitude', runway.get('touchdown1Longitude', 0)),
                 },
                 'touchdown2': {
-                    'lat': runway.get('touchdown2Latitude', 0),
-                    'lon': runway.get('touchdown2Longitude', 0),
+                    'lat': td2.get('latitude', runway.get('touchdown2Latitude', 0)),
+                    'lon': td2.get('longitude', runway.get('touchdown2Longitude', 0)),
                 }
             }
 
@@ -315,7 +321,7 @@ def main():
     with open('survey_map.html', 'w') as f:
         f.write(html_map)
 
-    print("✅ Map generated successfully: survey_map.html")
+    print("Map generated successfully: survey_map.html")
 
 if __name__ == '__main__':
     main()
