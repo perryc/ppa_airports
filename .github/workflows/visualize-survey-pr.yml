@@ -72,24 +72,91 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Post map as PR comment
+      - name: Upload interactive map as artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: survey-map-pr-${{ steps.pr.outputs.number }}
+          path: survey_map.html
+          retention-days: 90
+
+      - name: Generate summary from survey data
+        id: summary
+        run: |
+          python3 << 'PYEOF'
+          import json
+          from pathlib import Path
+
+          # Find survey files
+          survey_files = []
+          for json_file in Path('.').rglob('*.json'):
+              try:
+                  with open(json_file, 'r') as f:
+                      data = json.load(f)
+                      if 'runways' in data or 'runway' in data:
+                          survey_files.append(json_file)
+              except:
+                  continue
+
+          # Generate markdown summary
+          summary = []
+          for file_path in survey_files:
+              with open(file_path, 'r') as f:
+                  data = json.load(f)
+              
+              icao = data.get('icao_code', 'UNKNOWN')
+              name = data.get('name', '')
+              runways = data.get('runways', [])
+              
+              summary.append(f"### {icao} - {name}")
+              
+              for rwy in runways:
+                  designator = rwy.get('designation', 'N/A')
+                  heading = rwy.get('magnetic_heading', 0)
+                  length = rwy.get('length_ft', 0)
+                  width = rwy.get('width_ft', 0)
+                  
+                  thr1 = rwy.get('threshold1', {})
+                  thr2 = rwy.get('threshold2', {})
+                  
+                  summary.append(f"\n**Runway {designator}**")
+                  summary.append(f"- Heading: {heading:.1f}° magnetic")
+                  summary.append(f"- Dimensions: {length:.0f} ft × {width:.0f} ft")
+                  summary.append(f"- Threshold 1: {thr1.get('latitude', 0):.6f}, {thr1.get('longitude', 0):.6f}")
+                  summary.append(f"- Threshold 2: {thr2.get('latitude', 0):.6f}, {thr2.get('longitude', 0):.6f}")
+                  
+                  # Add Google Maps link
+                  lat_avg = (thr1.get('latitude', 0) + thr2.get('latitude', 0)) / 2
+                  lon_avg = (thr1.get('longitude', 0) + thr2.get('longitude', 0)) / 2
+                  maps_url = f"https://www.google.com/maps/@{lat_avg},{lon_avg},17z?entry=ttu"
+                  summary.append(f"- [View on Google Maps]({maps_url})")
+              
+              summary.append("")
+          
+          # Write to file
+          with open('survey_summary.md', 'w') as f:
+              f.write('\n'.join(summary))
+          PYEOF
+
+      - name: Post map link as PR comment
         uses: actions/github-script@v7
         env:
           PR_NUMBER: ${{ steps.pr.outputs.number }}
+          RUN_ID: ${{ github.run_id }}
         with:
           script: |
             const fs = require('fs');
-            const mapHtml = fs.readFileSync('survey_map.html', 'utf8');
+            const summary = fs.readFileSync('survey_summary.md', 'utf8');
+            
+            const runId = process.env.RUN_ID;
+            const mapUrl = `https://github.com/${{ github.repository }}/actions/runs/${runId}`;
 
-            // Create collapsible section for the map
+            // Create comment with summary and download link
             const comment = `## 🗺️ Survey Data Visualization
 
-            <details open>
-            <summary>Click to expand interactive map</summary>
+            ${summary}
 
-            ${mapHtml}
-
-            </details>
+            **📥 Download Interactive Map**
+            Download the [interactive HTML map](${mapUrl}) from the workflow artifacts to view it in your browser.
 
             **Legend:**
             - 🔴 Red markers: Runway corners (C1, C2, C3, C4)
