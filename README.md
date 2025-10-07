@@ -1,6 +1,6 @@
-# PPA Airports - Community Precision Airport Database
+# Pretty Precise Approach Runway Database
 
-High-precision airport and runway data for precision approach applications, crowdsourced from RTK/PPP GPS surveys.
+High-precision GPS runway data, crowdsourced from RTK/PPP GPS surveys.
 
 ## Why This Repository?
 
@@ -32,7 +32,7 @@ ppa_airports/
 
 ### Download the Database
 
-The PPA (Precision Pilot Assistant) app automatically downloads and updates this database. You can also access the data directly:
+The PPA (Pretty Precise Approach) app automatically downloads and updates this database. You can also access the data directly:
 
 ```bash
 git clone https://github.com/perryc/ppa_airports.git
@@ -123,19 +123,18 @@ This data is provided under the **Open Database License (ODbL)**. You are free t
 - Modify and build upon the data
 - Share and distribute the data
 
-**Attribution Required**: Please credit "PPA Airports Community Database"
 
 ## Support
 
 - Issues: https://github.com/perryc/ppa_airports/issues
 - Discussions: https://github.com/perryc/ppa_airports/discussions
-- App: https://github.com/perryc/ppa
+- Pretty Precise Approach App: https://github.com/perryc/ppa
 
 ## Statistics
 
-- **Airports**: 0
-- **Runways Surveyed**: 0
-- **Countries**: 0
+- **Airports**: 1
+- **Runways Surveyed**: 2
+- **Countries**: 1
 - **Last Update**: Never
 
 ---
