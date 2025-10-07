@@ -7,6 +7,73 @@
     "longitude": -105.03184237
   },
   "runways": [
+  {
+      "designation": "11\/29",
+      "length_ft": 2246,
+      "width_ft": 78,
+      "surface": "unknown",
+      "magnetic_heading": 110.2,
+      "threshold1": {
+        "latitude": 50.6386954,
+        "longitude": -105.04025895,
+        "elevation_ft": 1811
+      },
+      "threshold2": {
+        "latitude": 50.6358576,
+        "longitude": -105.03164372,
+        "elevation_ft": 1811
+      },
+      "touchdown1": {
+        "latitude": 50.63831641,
+        "longitude": -105.0391082
+      },
+      "touchdown2": {
+        "latitude": 50.63623658,
+        "longitude": -105.03279442
+      }
+    }
+  ],
+  "survey_metadata": {
+    "surveyed_by": "anonymous",
+    "survey_date": 1759638756620,
+    "survey_method": "4-corner mobile GPS survey",
+    "gps_accuracy_m": 1.03,
+    "magnetic_variation": 7.2,
+    "corner_points": [
+      {
+        "corner": "CORNER_1",
+        "latitude": 50.6361219,
+        "longitude": -105.03202723,
+        "elevation_ft": 1861,
+        "accuracy_m": 0.02,
+        "gps_source": "BLE_RTK_FIXED"
+      },
+      {
+        "corner": "CORNER_2",
+        "latitude": 50.63603243,
+        "longitude": -105.03175091,
+        "elevation_ft": 1861,
+        "accuracy_m": 0.02,
+        "gps_source": "BLE_RTK_FIXED"
+      },
+      {
+        "corner": "CORNER_3",
+        "latitude": 50.63285006,
+        "longitude": -105.03165067,
+        "elevation_ft": 1847,
+        "accuracy_m": 0.02,
+        "gps_source": "BLE_RTK_FIXED"
+      },
+      {
+        "corner": "CORNER_4",
+        "latitude": 50.63288086,
+        "longitude": -105.03194065,
+        "elevation_ft": 1849,
+        "accuracy_m": 0.02,
+        "gps_source": "BLE_RTK_FIXED"
+      }
+    ]
+  },
     {
       "designation": "17\/35",
       "length_ft": 1171,
